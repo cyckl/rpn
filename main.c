@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <ctype.h>
+#include <stdbool.h>
 
 struct level {
 	long double data;
@@ -44,8 +46,13 @@ void display() {
 	printf("\n");
 }
 
-int checkNumeric(char* input) {
+bool checkNumeric(char* input) {
+	for (size_t i = 0; i <= strlen(input) - 2; i++) {
+		if (!isdigit(input[i]))
 
+			return false;
+	}
+	return true;
 }
 
 void quit(int sig) {
@@ -124,21 +131,29 @@ void main() {
 
 	for (;;) {
 		int i = 0;
-		char input[32];
-		for (; (input[i] = getchar()) && input[i] != '\n'; i++){}
+		char *buffer;
+		size_t bufferSize = 32;
 
-		if (atof(input) != 0)
-			push(atof(input));
-		else if (strcmp(input, "+\n") == 0)
+		buffer = (char *)malloc(bufferSize * sizeof(char));
+		if (buffer == NULL) {
+			perror("Buffer allocate error\n");
+			exit(1);
+		}
+
+		size_t input = getline(&buffer, &bufferSize, stdin);
+
+		if (checkNumeric(buffer))
+			push(atof(buffer));
+		else if (strcmp(buffer, "+\n") == 0)
 			add();
-		else if (strcmp(input, "-\n") == 0)
+		else if (strcmp(buffer, "-\n") == 0)
 			sub();
-		else if (strcmp(input, "/\n") == 0)
+		else if (strcmp(buffer, "/\n") == 0)
 			divide();
-		else if (strcmp(input, "*\n") == 0)
+		else if (strcmp(buffer, "*\n") == 0)
 			mult();
 		else
-			printf("<%s>", input);
+			printf("Invalid op\n", buffer);
 
 		display();
 	}
