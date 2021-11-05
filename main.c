@@ -46,21 +46,28 @@ void display() {
 	printf("\n");
 }
 
-bool checkNumeric(char* input) {
-	for (size_t i = 0; i <= strlen(input) - 2; i++) {
-		if (!isdigit(input[i]))
+void popAll() {
+	printf("\n");
+	while (top != NULL)
+		pop();
+}
 
-			return false;
+bool checkNumeric(char* input) {
+	if (atof(input) != 0) {
+		return true;
+	} else {
+		for (size_t i = 0; i <= strlen(input) - 2; i++) {
+			if (!isdigit(input[i]))
+
+				return false;
+		}
+		return true;
 	}
-	return true;
 }
 
 void quit(int sig) {
 	if (sig == SIGINT) {
-		printf("\n");
-		while (top != NULL)
-			pop();
-		display();
+		popAll();
 		exit(0);
 	}
 }
@@ -125,7 +132,7 @@ void mult() {
 	push(b);
 }
 
-void main() {
+int main() {
 	display();
 	signal(SIGINT, quit);
 
@@ -152,9 +159,13 @@ void main() {
 			divide();
 		else if (strcmp(buffer, "*\n") == 0)
 			mult();
+		else if (strcmp(buffer, "CLEAR\n") == 0)
+			popAll();
 		else
-			printf("Invalid op\n", buffer);
+			printf("Invalid op\n");
 
 		display();
 	}
+
+	return 0;
 }
